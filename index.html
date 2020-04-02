@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat with Sockets</title>
+</head>
+<body>
+  <h1>Chat With Sockets!</h1>
+  <h2>Say something!</h2>
+  <form id="chat-form">
+    <div>
+      <label>Comment:</label>
+      <input type="text" id="chat">
+    </div>
+    <div>
+      <label>Name:</label>
+      <input type="text" id="name" value="Anonymous">
+    </div>
+    <input type="submit" value="Say It!">
+  </form>
+
+  <hr>
+  <h2>Ongoing Conversation</h2>
+  <div id="result"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Define socket.io
+    let socket = io()
+
+    document.getElementById('chat-form').addEventListener('submit', e => {
+      // Cancel the postback
+      e.preventDefault()
+
+      // Grab the info from the form
+      let name = document.getElementById('name').value
+      let chat = document.getElementById('chat').value
+
+      // Make sure form fields aren't empty
+      if (!name || !chat) {
+        console.log('Empty message')
+        return
+      }
+
+      // Format the message
+      let message = `${name} says: ${chat}`
+
+      // Send the message via the socket
+      socket.emit('chat message', message)
+
+      // Clear out the chat textbox
+      document.getElementById('chat').value = ''
+    })
+
+    // Code for what to do when message is received
+    socket.on('chat message', message => {
+      console.log(message)
+      // We've received a message, now we print it out in a <p>
+      let p = document.createElement('p')
+      p.textContent = message
+
+      // Add the <p> created to the DOM
+      document.getElementById('result').append(p)
+    })
+  </script>
+</body>
+</html>
